@@ -109,3 +109,10 @@ Handles communication between users on the platform.
 | **Property → Review** | A **Property** can have multiple **Reviews** (1:N) |
 | **User → Review** | A **User (guest)** can leave multiple **Reviews** (1:N) |
 | **User → Message (sender/recipient)** | Users can send and receive multiple **Messages** (N:M through sender and recipient relationships) |
+
+
+##  ER Diagram
+
+You can view the full **Entity-Relationship Diagram (ERD)** here:  
+![AirBnB ERD](https://github.com/benjamin-o-ansah/alx-airbnb-database/blob/main/ERD_airbnb.png)
+
