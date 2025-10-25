@@ -114,5 +114,5 @@ Handles communication between users on the platform.
 ##  ER Diagram
 
 You can view the full **Entity-Relationship Diagram (ERD)** here:  
-![AirBnB ERD](https://github.com/benjamin-o-ansah/alx-airbnb-database/blob/main/ERD_airbnb.png)
+![AirBnB ERD](https://github.com/benjamin-o-ansah/alx-airbnb-database/blob/main/ERD/ERD_airbnb.png)
 
