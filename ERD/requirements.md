@@ -98,7 +98,7 @@ Handles communication between users on the platform.
 
 ---
 
-## Entity Relationships
+##  Entity Relationships
 
 | Relationship | Description |
 |---------------|--------------|
@@ -110,6 +110,59 @@ Handles communication between users on the platform.
 | **User → Review** | A **User (guest)** can leave multiple **Reviews** (1:N) |
 | **User → Message (sender/recipient)** | Users can send and receive multiple **Messages** (N:M through sender and recipient relationships) |
 
+
+##  Database Normalization
+
+- **1NF:** Each field contains atomic values.  
+- **2NF:** All non-key attributes depend on the full primary key.  
+- **3NF:** No transitive dependencies — user details are not repeated across entities; relationships use foreign keys instead.
+
+
+##   Constraints
+
+### **User Table**
+- **Unique constraint:** `email`
+- **Non-null constraints:** `first_name`, `last_name`, `email`, `password_hash`, `role`
+- **Role constraint:** ENUM values limited to (`guest`, `host`, `admin`)
+
+### **Property Table**
+- **Foreign key constraint:** `host_id` → `User(user_id)`
+- **Non-null constraints:** `name`, `description`, `location`, `pricepernight`
+
+### **Booking Table**
+- **Foreign key constraints:**  
+  - `property_id` → `Property(property_id)`  
+  - `user_id` → `User(user_id)`
+- **Status constraint:** ENUM values limited to (`pending`, `confirmed`, `canceled`)
+- **Non-null constraints:** `start_date`, `end_date`, `total_price`, `status`
+
+### **Payment Table**
+- **Foreign key constraint:** `booking_id` → `Booking(booking_id)`
+- **Ensures** payment is linked to a valid booking.
+- **Non-null constraints:** `amount`, `payment_method`
+
+### **Review Table**
+- **Foreign key constraints:**  
+  - `property_id` → `Property(property_id)`  
+  - `user_id` → `User(user_id)`
+- **Rating constraint:** Must be between **1 and 5**
+- **Non-null constraints:** `rating`, `comment`
+
+### **Message Table**
+- **Foreign key constraints:**  
+  - `sender_id` → `User(user_id)`  
+  - `recipient_id` → `User(user_id)`
+- **Non-null constraints:** `message_body`
+
+---
+
+##  Indexing
+
+- **Primary Keys:** Automatically indexed in all tables.  
+- **Additional Indexes:**
+  - `email` in **User** table (for faster lookup and uniqueness)
+  - `property_id` in **Property** and **Booking** tables (for efficient joins)
+  - `booking_id` in **Booking** and **Payment** tables (for performance on relationship queries)
 
 ##  ER Diagram
 
