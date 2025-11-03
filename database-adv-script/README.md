@@ -124,3 +124,43 @@ The queries are based on a hypothetical schema for a property rental application
     1.  The outer query iterates through each user in the `users` table.
     2.  For each user, the inner query is executed. It counts the total number of bookings in the `bookings` table that belong to that specific user (`WHERE b.user_id = u.user_id`).
     3.  The outer query's `WHERE` clause then checks if this count is greater than 3. If it is, the user is included in the final result set.
+
+# SQL Aggregation and Window Functions
+
+This document explains the SQL queries in the `aggregations_and_windows.sql` script. These queries demonstrate how to use aggregation and window functions to analyze data from a hypothetical property rental application.
+
+## Assumed Database Schema
+
+The queries assume a simple relational database schema with the following tables:
+
+-   **`users`**: Stores user information.
+    -   `user_id` (Primary Key)
+    -   `username`
+-   **`properties`**: Stores details about each property listing.
+    -   `property_id` (Primary Key)
+    -   `title`
+-   **`bookings`**: Records each booking, linking a user to a property.
+    -   `booking_id` (Primary Key)
+    -   `user_id` (Foreign Key to `users`)
+    -   `property_id` (Foreign Key to `properties`)
+    -   `booking_date`
+
+## Queries Explained
+
+### 1. Total Bookings per User (Aggregation)
+
+This query calculates the total number of bookings made by each user.
+
+-   **`COUNT(b.booking_id)`**: This aggregate function counts the number of bookings.
+-   **`GROUP BY u.user_id, u.username`**: This clause groups the rows so that `COUNT` works on a per-user basis. All bookings for a single user are grouped together, and the count is calculated for that group.
+-   **`JOIN`**: An `INNER JOIN` is used to link the `users` and `bookings` tables to retrieve the username for each user ID.
+
+### 2. Ranking Properties by Bookings (Window Functions)
+
+This query ranks properties based on how many bookings they have received. It uses a Common Table Expression (CTE) and several window functions to achieve this.
+
+-   **`WITH PropertyBookingCounts AS (...)`**: The CTE first calculates the total number of bookings for each property, creating a temporary result set named `PropertyBookingCounts`. This simplifies the main query.
+-   **`OVER (ORDER BY pbc.booking_count DESC)`**: This is the window function clause. It defines the "window" of rows (in this case, all rows) and the order in which they should be processed to calculate the rank.
+-   **`ROW_NUMBER()`**: Assigns a unique, sequential number to each property based on its booking count (e.g., 1, 2, 3, 4). No two rows will have the same row number.
+-   **`RANK()`**: Assigns a rank to each property. If two properties have the same number of bookings, they receive the same rank. The next rank is then skipped (e.g., 1, 2, 2, 4).
+-   **`DENSE_RANK()`**: Similar to `RANK`, but it does not skip ranks after a tie (e.g., 1, 2, 2, 3). This is useful when you want a continuous ranking.
