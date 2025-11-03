@@ -2,15 +2,18 @@
 -- DATABASE INDEX SCRIPT
 -- Project: Airbnb Booking System (Example)
 -- Description: Creates indexes on high-usage columns to optimize JOIN, WHERE, and ORDER BY performance.
+-- Also demonstrates performance analysis using EXPLAIN ANALYZE.
 -- ========================================
 
--- Identify High-Usage Columns:
+-- ========================================
+-- 1. IDENTIFY HIGH-USAGE COLUMNS
+-- ========================================
 -- USERS table: user_id, email
 -- BOOKINGS table: booking_id, user_id, property_id, booking_date
 -- PROPERTIES table: property_id, location, property_name
 
 -- ========================================
--- 1. CREATE INDEXES
+-- 2. CREATE INDEXES
 -- ========================================
 
 -- USERS Table
@@ -29,38 +32,51 @@ CREATE INDEX idx_properties_location ON properties(location);
 CREATE INDEX idx_properties_property_name ON properties(property_name);
 
 -- ========================================
--- 2. TEST QUERY PERFORMANCE BEFORE AND AFTER INDEXES
+-- 3. PERFORMANCE ANALYSIS USING EXPLAIN ANALYZE
 -- ========================================
--- Use EXPLAIN (MySQL/PostgreSQL) or ANALYZE (PostgreSQL) to measure execution plan and cost.
+-- Run these queries BEFORE and AFTER creating indexes to compare performance.
+-- EXPLAIN ANALYZE shows actual execution time and query plan.
 
--- Example A: Query Before Indexing
--- (Run this before executing CREATE INDEX commands)
-EXPLAIN SELECT 
-    bookings.booking_id,
-    bookings.property_id,
-    bookings.booking_date,
-    users.first_name,
-    users.last_name
-FROM bookings
-INNER JOIN users ON bookings.user_id = users.user_id
-WHERE bookings.booking_date > '2025-01-01'
-ORDER BY bookings.booking_date DESC;
+-- Example 1: Analyze Join and Filter Query Performance
+EXPLAIN ANALYZE
+SELECT 
+    b.booking_id,
+    b.property_id,
+    b.booking_date,
+    u.first_name,
+    u.last_name
+FROM bookings b
+INNER JOIN users u 
+    ON b.user_id = u.user_id
+WHERE b.booking_date > '2025-01-01'
+ORDER BY b.booking_date DESC;
 
--- Example B: Query After Indexing
--- (Run this after executing CREATE INDEX commands)
-EXPLAIN SELECT 
-    bookings.booking_id,
-    bookings.property_id,
-    bookings.booking_date,
-    users.first_name,
-    users.last_name
-FROM bookings
-INNER JOIN users ON bookings.user_id = users.user_id
-WHERE bookings.booking_date > '2025-01-01'
-ORDER BY bookings.booking_date DESC;
+-- Example 2: Analyze Property Review Query Performance
+EXPLAIN ANALYZE
+SELECT 
+    p.property_name,
+    COUNT(r.review_id) AS total_reviews
+FROM properties p
+LEFT JOIN reviews r
+    ON p.property_id = r.property_id
+GROUP BY p.property_name
+ORDER BY total_reviews DESC;
+
+-- Example 3: Analyze Aggregation and Filtering Query
+EXPLAIN ANALYZE
+SELECT 
+    u.user_id,
+    CONCAT(u.first_name, ' ', u.last_name) AS full_name,
+    COUNT(b.booking_id) AS total_bookings
+FROM users u
+LEFT JOIN bookings b
+    ON u.user_id = b.user_id
+GROUP BY u.user_id, full_name
+HAVING COUNT(b.booking_id) > 3
+ORDER BY total_bookings DESC;
 
 -- ========================================
--- 3. OPTIONAL: DROP INDEXES (if re-testing)
+-- 4. OPTIONAL: DROP INDEXES FOR RE-TESTING
 -- ========================================
 -- DROP INDEX idx_users_email ON users;
 -- DROP INDEX idx_bookings_user_id ON bookings;
