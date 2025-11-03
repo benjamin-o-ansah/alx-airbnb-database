@@ -16,7 +16,8 @@ SELECT
     users.email
 FROM bookings
 INNER JOIN users
-ON bookings.user_id = users.user_id;
+ON bookings.user_id = users.user_id
+ORDER BY bookings.booking_date DESC;
 
 -- ========================================
 
@@ -30,7 +31,8 @@ SELECT
     reviews.comment
 FROM properties
 LEFT JOIN reviews
-ON properties.property_id = reviews.property_id;
+ON properties.property_id = reviews.property_id
+ORDER BY properties.property_name ASC;
 
 -- ========================================
 
@@ -57,7 +59,8 @@ SELECT
     bookings.booking_date
 FROM users
 RIGHT JOIN bookings
-ON users.user_id = bookings.user_id;
+ON users.user_id = bookings.user_id
+ORDER BY booking_date DESC, user_id ASC;
 
 -- ========================================
 -- END OF SCRIPT
